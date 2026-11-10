@@ -57,9 +57,9 @@ sql/hogwarts.sql              seu script: todas as respostas aqui
 ## Como entregar
 
 1. Logado no GitHub, clique em **Fork** (canto superior direito) e depois em **Create fork**. O fork é a sua cópia individual.
-2. No fork, preencha a tabela **Aluno** no topo deste README: clique em `README.md`, depois no lápis ✏️, e em **Commit changes**.
+2. No fork, preencha a tabela **Aluno** no topo deste README: clique em `README.md`, depois no lápis, e em **Commit changes**.
 3. Clone o fork (`git clone <link-do-seu-fork>`) e faça o trabalho em `sql/hogwarts.sql`, com **pelo menos 5 commits** ao longo das seções (por exemplo, um commit por seção concluída).
 4. Antes de entregar, rode o script inteiro do zero e confira se ele executa sem erros, exceto nos comandos que a atividade pede para falhar. Esses devem ficar **comentados**, com a explicação do erro.
 5. Para entregar, no fork clique em **Contribute → Open pull request**, preencha o modelo e clique em **Create pull request**. Cada novo `git push` atualiza o mesmo Pull Request até o prazo.
 
-⚠️ Não edite o repositório do professor, só o seu fork.
+ Não edite o repositório do professor, só o seu fork.
