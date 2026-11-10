@@ -173,3 +173,111 @@ INSERT INTO produto (nome_produto, loja, preco, estoque) VALUES
 ('Caldeirão de Estanho',             'Caldeirões Potage',    9.00,   0), -- 6
 ('Kit de Logros',                    'Gemialidades Weasley', 25.00, 40), -- 7
 ('Pena de Repetição Rápida',         'Escribbulus',         15.00,   5); -- 8
+
+-- ============================================================================
+-- SEÇÃO 2: ALTER TABLE e UPDATE (Questões 1 a 12)
+-- ============================================================================
+
+-- Q1:
+ALTER TABLE aluno ADD COLUMN email VARCHAR(100);
+
+-- Q2:
+ALTER TABLE matricula ADD COLUMN situacao VARCHAR(20) DEFAULT 'Cursando';
+
+-- Q3:
+ALTER TABLE produto ADD COLUMN ativo CHAR(1) DEFAULT 'S';
+
+-- Q4:
+ALTER TABLE casa MODIFY COLUMN fundador VARCHAR(100);
+
+-- Q5:
+ALTER TABLE professor RENAME COLUMN data_contratacao TO data_admissao;
+
+-- Q6:
+UPDATE aluno
+SET email = CONCAT(LOWER(REPLACE(nome, ' ', '.')), '@hogwarts.edu');
+
+-- Q7:
+ALTER TABLE aluno ADD CONSTRAINT uq_aluno_email UNIQUE (email);
+
+-- Q8:
+UPDATE matricula
+SET nota = LEAST(10.00, nota + 0.5)
+WHERE id_disc IN (
+    SELECT id_disc
+    FROM disciplina
+    WHERE id_prof IN (
+        SELECT id_prof
+        FROM professor
+        WHERE nome = 'Remo Lupin'
+    )
+);
+
+-- Q9:
+UPDATE matricula
+SET situacao = CASE
+    WHEN nota >= 6.0 THEN 'Aprovado'
+    ELSE 'Reprovado'
+END;
+
+-- Q10:
+UPDATE professor
+SET salario = salario * 1.10
+WHERE id_casa IS NOT NULL
+  AND data_admissao < '1980-01-01';
+
+-- Q11:
+UPDATE produto
+SET ativo = 'N'
+WHERE estoque = 0;
+
+-- Q12:
+UPDATE produto
+SET preco = preco * 0.80
+WHERE loja = 'Dedosdemel';
+
+
+-- ============================================================================
+-- SEÇÃO 3: DELETE e Testes de Restrições (Questões 13 a 19)
+-- Lembre-se: comandos que FALHAM devem ser COMENTADOS com o erro explicado!
+-- ============================================================================
+
+-- Q13:
+-- DELETE FROM casa WHERE nome_casa = 'Sonserina';
+-- Erro 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`hogwarts`.`professor`, CONSTRAINT `fk_professor_casa` FOREIGN KEY (`id_casa`) REFERENCES `casa` (`id_casa`)).
+-- Explicação: O banco recusa a exclusão porque a casa Sonserina (id_casa = 2) possui registros filhos vinculados por chave estrangeira nas tabelas `professor` (Severo Snape) e `aluno` (Draco, Pansy e Vicente).
+
+-- Q14:
+-- INSERT INTO aluno (nome, ano_escolar, id_casa) VALUES ('Dobby', 8, 1);
+-- Erro 3819 (HY000): Check constraint 'aluno_chk_1' is violated.
+-- Explicação: A tabela `aluno` possui uma restrição CHECK (`ano_escolar BETWEEN 1 AND 7`) que impede o cadastro de alunos em anos escolares fora do intervalo de 1 a 7.
+
+-- Q15:
+-- INSERT INTO aluno (nome, ano_escolar, id_casa, email) VALUES ('Harry Potter (Polissuco)', 5, 1, 'harry.potter@hogwarts.edu');
+-- Erro 1062 (23000): Duplicate entry 'harry.potter@hogwarts.edu' for key 'aluno.uq_aluno_email'.
+-- Explicação: A restrição UNIQUE `uq_aluno_email` criada na questão 7 impede que dois registros na tabela `aluno` possuam o mesmo endereço de e-mail.
+
+-- Q16:
+-- DELETE FROM professor WHERE nome = 'Severo Snape';
+-- Erro 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`hogwarts`.`disciplina`, CONSTRAINT `fk_disciplina_professor` FOREIGN KEY (`id_prof`) REFERENCES `professor` (`id_prof`)).
+-- Explicação: O professor Severo Snape (id_prof = 2) está referenciado como chave estrangeira na tabela `disciplina` (Poções), impedindo sua remoção enquanto o vínculo existir.
+
+-- Q17:
+DELETE FROM professor WHERE nome = 'Gilderoy Lockhart';
+-- Explicação: Este DELETE funciona porque Gilderoy Lockhart (id_prof = 8) não ministra nenhuma disciplina na tabela `disciplina` e não possui registros dependentes em `registro_pontos`.
+
+-- Q18:
+DELETE FROM matricula
+WHERE id_aluno IN (
+    SELECT id_aluno FROM aluno WHERE nome = 'Vicente Crabbe'
+);
+
+DELETE FROM aluno
+WHERE nome = 'Vicente Crabbe';
+
+-- Q19:
+DELETE FROM disciplina
+WHERE id_disc NOT IN (
+    SELECT DISTINCT id_disc FROM matricula
+);
+
